@@ -1,0 +1,6 @@
+#pragma once
+#define EAR_VERSION "0.9.0"
+#define EAR_VERSION_MAJOR 0
+#define EAR_VERSION_MINOR 9
+#define EAR_VERSION_PATCH 0
+#define EAR_BUILD_DATE "2024-05-02T15:35:08"

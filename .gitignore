@@ -1,0 +1,18 @@
+# IDE files
+/.vscode
+/.cache
+/_deps
+
+# Build files
+/build
+/cmake-build-install
+/lib
+/third_party/iamf/include/iamf/commit_hash.h
+
+# CTest
+/Testing
+
+# The wraptool_helper, which can not be checked in
+/scripts/wraptool_helper.sh
+
+.DS_Store

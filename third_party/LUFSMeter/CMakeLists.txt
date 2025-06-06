@@ -1,0 +1,5 @@
+add_library(lufs_meter INTERFACE)
+target_include_directories(lufs_meter INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(lufs_meter INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src/filters")
+target_sources(lufs_meter INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src/EBU128LoudnessMeter.cpp")
+target_sources(lufs_meter INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src/filters/SecondOrderIIRFilter.cpp")
