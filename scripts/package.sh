@@ -15,10 +15,9 @@
 # limitations under the License.
 
 # USAGE GUIDE:
-# This script builds installers for AAX plugins, VST3 plugins, or both:
-# --format=aax: AAX plugins only (default)
-# --format=vst3: VST3 plugins only
-# --format=both: Both AAX and VST3 plugins
+# This script builds installers for AAX plugins or VST3 plugins separately:
+# --format=aax: AAX plugins only (default) - installs for all users only
+# --format=vst3: VST3 plugins only - allows user to choose installation location
 #
 # AAX plugins: Uses wraptool if present, otherwise uses ad-hoc signing
 # VST3 plugins: Uses standard Apple code signing
@@ -42,11 +41,15 @@ done
 
 # Validate plugin format option
 case $PLUGIN_FORMAT in
-    aax|vst3|both)
-        echo "Building for plugin format(s): $PLUGIN_FORMAT"
+    aax|vst3)
+        echo "Building for plugin format: $PLUGIN_FORMAT"
+        ;;
+    both)
+        echo "Error: 'both' format option is no longer supported. Use separate builds for --format=aax and --format=vst3"
+        exit 1
         ;;
     *)
-        echo "Error: Invalid format option. Use --format=aax, --format=vst3, or --format=both"
+        echo "Error: Invalid format option. Use --format=aax or --format=vst3"
         exit 1
         ;;
 esac
@@ -54,12 +57,11 @@ esac
 case "$PLUGIN_FORMAT" in
     aax)
         FORMAT_SUFFIX="AAX"
+        DISTRIBUTION_XML="./distribution_aax.xml"
         ;;
     vst3)
         FORMAT_SUFFIX="VST3"
-        ;;
-    both|*)
-        FORMAT_SUFFIX="AAX_VST3"
+        DISTRIBUTION_XML="./distribution_vst3.xml"
         ;;
 esac
 
@@ -123,7 +125,7 @@ LICENSE_FILE="${ECLIPSA_LICENSE_FILE:-../LICENSE}"
 # CORE PATHS - NORMALLY DON'T NEED TO MODIFY
 # ======================================================
 
-# Define paths to the plugins - both AAX and VST3
+# Define paths to the plugins - AAX and VST3
 # AAX Plugin Paths
 AAX_RENDERER_PLUGIN_BINARY="../build/rendererplugin/RendererPlugin_artefacts/$BUILD_CONFIG/AAX/Eclipsa Audio Renderer.aaxplugin/Contents/MacOS/Eclipsa Audio Renderer"
 AAX_AUDIOELEMENT_PLUGIN_BINARY="../build/audioelementplugin/AudioElementPlugin_artefacts/$BUILD_CONFIG/AAX/Eclipsa Audio Element Plugin.aaxplugin/Contents/MacOS/Eclipsa Audio Element Plugin"
@@ -707,13 +709,10 @@ process_vst3_plugins() {
 
 # Process plugins based on selected format
 case "$PLUGIN_FORMAT" in
-    aax|both)
+    aax)
         process_aax_plugins
         ;;
-esac
-
-case "$PLUGIN_FORMAT" in
-    vst3|both)
+    vst3)
         process_vst3_plugins
         ;;
 esac
@@ -729,7 +728,7 @@ run_cmd "sudo rm -rf ./plugins_pkg"
 run_cmd "mkdir -p \"./plugins_pkg/Library/Application Support/Eclipsa Audio Plugins\""
 
 # Create plugin directories and copy plugins based on format
-if [[ "$PLUGIN_FORMAT" == "aax" || "$PLUGIN_FORMAT" == "both" ]]; then
+if [[ "$PLUGIN_FORMAT" == "aax" ]]; then
     # Create AAX directory
     run_cmd "mkdir -p \"./plugins_pkg/Library/Application Support/Avid/Audio/Plug-Ins\""
     
@@ -738,8 +737,8 @@ if [[ "$PLUGIN_FORMAT" == "aax" || "$PLUGIN_FORMAT" == "both" ]]; then
         \"./plugins_pkg/Library/Application Support/Avid/Audio/Plug-Ins\""
 fi
 
-if [[ "$PLUGIN_FORMAT" == "vst3" || "$PLUGIN_FORMAT" == "both" ]]; then
-    # Create VST3 directory
+if [[ "$PLUGIN_FORMAT" == "vst3" ]]; then
+    # Create VST3 system directory
     run_cmd "mkdir -p \"./plugins_pkg/Library/Audio/Plug-Ins/VST3\""
     
     # Handle VST3 plugins, fixing nested bundles if needed
@@ -754,6 +753,8 @@ if [[ "$PLUGIN_FORMAT" == "vst3" || "$PLUGIN_FORMAT" == "both" ]]; then
         run_cmd "sudo cp -R \"$VST3_RENDERER_PLUGIN_SIGNED\" \"$VST3_AUDIOELEMENT_PLUGIN_SIGNED\" \
             \"./plugins_pkg/Library/Audio/Plug-Ins/VST3/\""
     fi
+    
+
 fi
 
 # Copy license for all formats
@@ -770,11 +771,11 @@ run_cmd "pkgbuild --root \"./plugins_pkg\" --identifier \"$BUNDLE_IDENTIFIER\" -
 # Build the distribution, signing it if developer ID available
 if [ -n "${DEVELOPER_ID_INSTALLER:-}" ]; then
     log "Building signed distribution package"
-    run_cmd "productbuild --distribution \"./distribution.xml\" --resources \"./\" --package-path \"./\" \"./temp_$INSTALLER_NAME\" --sign \"$DEVELOPER_ID_INSTALLER\""
+    run_cmd "productbuild --distribution \"$DISTRIBUTION_XML\" --resources \"./\" --package-path \"./\" \"./temp_$INSTALLER_NAME\" --sign \"$DEVELOPER_ID_INSTALLER\""
 else
     # Default unsigned build
     log "Building unsigned distribution package"
-    run_cmd "productbuild --distribution \"./distribution.xml\" --resources \"./\" --package-path \"./\" \"./temp_$INSTALLER_NAME\""
+    run_cmd "productbuild --distribution \"$DISTRIBUTION_XML\" --resources \"./\" --package-path \"./\" \"./temp_$INSTALLER_NAME\""
 fi
 
 # Create the custom icon version of the package
@@ -879,15 +880,6 @@ EOF
 This package contains VST3 plugins compatible with VST3-supporting DAWs.
 
 ## Installation Locations
-• VST3 plugins: /Library/Audio/Plug-Ins/VST3
-EOF
-            ;;
-        both)
-            cat >> "$output_file" << EOF
-This package contains both AAX and VST3 plugins.
-
-## Installation Locations
-• AAX plugins: /Library/Application Support/Avid/Audio/Plug-Ins
 • VST3 plugins: /Library/Audio/Plug-Ins/VST3
 EOF
             ;;

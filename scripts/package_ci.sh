@@ -23,8 +23,8 @@ BRANCH_NAME="${BRANCH_NAME_RAW//\//_}"
 
 SKIP_PACE_WRAPPING="${SKIP_PACE_WRAPPING:-false}"
 
-# Plugin format selection (similar to package.sh)
-PLUGIN_FORMAT="${PLUGIN_FORMAT:-aax}" # Default to AAX, options: aax, vst3, both
+# Plugin format selection (AAX or VST3 only)
+PLUGIN_FORMAT="${PLUGIN_FORMAT:-aax}" # Default to AAX, options: aax, vst3
 
 # Set format suffix based on plugin format
 case "$PLUGIN_FORMAT" in
@@ -34,8 +34,13 @@ case "$PLUGIN_FORMAT" in
     vst3)
         FORMAT_SUFFIX="VST3"
         ;;
-    both|*)
-        FORMAT_SUFFIX="AAX_VST3"
+    both)
+        echo "Error: 'both' format option is no longer supported. Use separate builds for aax and vst3"
+        exit 1
+        ;;
+    *)
+        echo "Error: Invalid plugin format. Use PLUGIN_FORMAT=aax or PLUGIN_FORMAT=vst3"
+        exit 1
         ;;
 esac
 
@@ -83,7 +88,7 @@ echo "DEV_INSTALLER_IDENTITY: $DEV_INSTALLER_IDENTITY"
 echo "APPLE_TEAM_ID: $APPLE_TEAM_ID"
 echo "APPLE_ACCOUNT_EMAIL: $APPLE_ACCOUNT_EMAIL"
 echo "KEYCHAIN_PATH: $KEYCHAIN_PATH"
-if [[ "$PLUGIN_FORMAT" == "aax" || "$PLUGIN_FORMAT" == "both" ]] && [ "$SKIP_PACE_WRAPPING" != "true" ]; then
+if [[ "$PLUGIN_FORMAT" == "aax" ]] && [ "$SKIP_PACE_WRAPPING" != "true" ]; then
     echo "PACE_ACCOUNT: $PACE_ACCOUNT"
     echo "PACE_RENDERER_WCGUID: $PACE_RENDERER_WCGUID"
     echo "PACE_AUDIOELEMENT_WCGUID: $PACE_AUDIOELEMENT_WCGUID"
@@ -146,14 +151,25 @@ fi
 INSTALLER_OUTPUT_DIR="build/installers"
 INSTALLER_NAME="Eclipsa_${FORMAT_SUFFIX}_${BRANCH_NAME}.pkg"
 FINAL_INSTALLER_PATH="$INSTALLER_OUTPUT_DIR/$INSTALLER_NAME"
-# Check for distribution.xml in various locations
-if [ -f "./distribution.xml" ]; then
-    DISTRIBUTION_XML="./distribution.xml"
-elif [ -f "./scripts/distribution.xml" ]; then
-    DISTRIBUTION_XML="./scripts/distribution.xml"
-else
-    echo "Error: Distribution XML not found. Looked for ./distribution.xml and ./scripts/distribution.xml"
-    exit 1
+# Check for distribution.xml in various locations based on plugin format
+if [ "$PLUGIN_FORMAT" = "aax" ]; then
+    if [ -f "./distribution_aax.xml" ]; then
+        DISTRIBUTION_XML="./distribution_aax.xml"
+    elif [ -f "./scripts/distribution_aax.xml" ]; then
+        DISTRIBUTION_XML="./scripts/distribution_aax.xml"
+    else
+        echo "Error: AAX Distribution XML not found. Looked for ./distribution_aax.xml and ./scripts/distribution_aax.xml"
+        exit 1
+    fi
+elif [ "$PLUGIN_FORMAT" = "vst3" ]; then
+    if [ -f "./distribution_vst3.xml" ]; then
+        DISTRIBUTION_XML="./distribution_vst3.xml"
+    elif [ -f "./scripts/distribution_vst3.xml" ]; then
+        DISTRIBUTION_XML="./scripts/distribution_vst3.xml"
+    else
+        echo "Error: VST3 Distribution XML not found. Looked for ./distribution_vst3.xml and ./scripts/distribution_vst3.xml"
+        exit 1
+    fi
 fi
 COMPONENT_PKG_DIR="build/component_pkgs"
 COMPONENT_PKG_PATH="$COMPONENT_PKG_DIR/EclipsaPluginsComponent.pkg"
@@ -243,12 +259,12 @@ if [ ! -f "$LICENSE_FILE" ]; then echo "Error: License file not found at $LICENS
 if [ ! -f "$DISTRIBUTION_XML" ]; then echo "Error: Distribution XML not found at $DISTRIBUTION_XML"; exit 1; fi
 
 # Check plugin paths based on format
-if [[ "$PLUGIN_FORMAT" == "aax" || "$PLUGIN_FORMAT" == "both" ]]; then
+if [[ "$PLUGIN_FORMAT" == "aax" ]]; then
     if [ ! -d "$AAX_RENDERER_PLUGIN_SRC" ]; then echo "Error: AAX Renderer plugin source not found at $AAX_RENDERER_PLUGIN_SRC"; exit 1; fi
     if [ ! -d "$AAX_AUDIOELEMENT_PLUGIN_SRC" ]; then echo "Error: AAX AudioElement plugin source not found at $AAX_AUDIOELEMENT_PLUGIN_SRC"; exit 1; fi
 fi
 
-if [[ "$PLUGIN_FORMAT" == "vst3" || "$PLUGIN_FORMAT" == "both" ]]; then
+if [[ "$PLUGIN_FORMAT" == "vst3" ]]; then
     if [ ! -d "$VST3_RENDERER_PLUGIN_SRC" ]; then echo "Error: VST3 Renderer plugin source not found at $VST3_RENDERER_PLUGIN_SRC"; exit 1; fi
     if [ ! -d "$VST3_AUDIOELEMENT_PLUGIN_SRC" ]; then echo "Error: VST3 AudioElement plugin source not found at $VST3_AUDIOELEMENT_PLUGIN_SRC"; exit 1; fi
 fi
@@ -272,7 +288,7 @@ unlock_keychain
 # 2. Adjust RPATH and sign dylibs based on selected plugin format
 echo "Adjusting RPATH and signing dylibs for selected plugin formats..."
 
-if [[ "$PLUGIN_FORMAT" == "aax" || "$PLUGIN_FORMAT" == "both" ]]; then
+if [[ "$PLUGIN_FORMAT" == "aax" ]]; then
     # Adjust RPATH for AAX plugins
     echo "Processing AAX plugins..."
     adjust_rpath "$AAX_RENDERER_PLUGIN_BINARY"
@@ -284,7 +300,7 @@ if [[ "$PLUGIN_FORMAT" == "aax" || "$PLUGIN_FORMAT" == "both" ]]; then
     find "$AAX_AUDIOELEMENT_PLUGIN_RESOURCES" -name '*.dylib' -print0 | while IFS= read -r -d $'\0' dylib; do sign_file_dev_app "$dylib"; done
 fi
 
-if [[ "$PLUGIN_FORMAT" == "vst3" || "$PLUGIN_FORMAT" == "both" ]]; then
+if [[ "$PLUGIN_FORMAT" == "vst3" ]]; then
     # Adjust RPATH for VST3 plugins
     echo "Processing VST3 plugins..."
     adjust_rpath "$VST3_RENDERER_PLUGIN_BINARY"
@@ -309,7 +325,7 @@ mkdir -p "$VST3_RENDERER_PLUGIN_SIGNING_DIR"
 mkdir -p "$VST3_AUDIOELEMENT_PLUGIN_SIGNING_DIR"
 
 # Process AAX Plugins
-if [[ "$PLUGIN_FORMAT" == "aax" || "$PLUGIN_FORMAT" == "both" ]]; then
+if [[ "$PLUGIN_FORMAT" == "aax" ]]; then
     echo "Processing AAX plugins with PACE wrapping: $SKIP_PACE_WRAPPING"
     
     if [ "$SKIP_PACE_WRAPPING" != "true" ]; then
@@ -343,7 +359,7 @@ if [[ "$PLUGIN_FORMAT" == "aax" || "$PLUGIN_FORMAT" == "both" ]]; then
 fi
 
 # Process VST3 Plugins
-if [[ "$PLUGIN_FORMAT" == "vst3" || "$PLUGIN_FORMAT" == "both" ]]; then
+if [[ "$PLUGIN_FORMAT" == "vst3" ]]; then
     echo "Processing VST3 plugins..."
     
     # Copy to output directories first
@@ -447,13 +463,13 @@ rm -rf "$PACKAGING_STAGING_DIR"
 mkdir -p "$PACKAGING_STAGING_DIR/Library/Application Support/Eclipsa Audio Plugins"
 
 # Copy different plugins based on format
-if [[ "$PLUGIN_FORMAT" == "aax" || "$PLUGIN_FORMAT" == "both" ]]; then
+if [[ "$PLUGIN_FORMAT" == "aax" ]]; then
     echo "Adding AAX plugins to package..."
     mkdir -p "$PACKAGING_STAGING_DIR/Library/Application Support/Avid/Audio/Plug-Ins"
     cp -R "$AAX_RENDERER_PLUGIN_SIGNED" "$AAX_AUDIOELEMENT_PLUGIN_SIGNED" "$PACKAGING_STAGING_DIR/Library/Application Support/Avid/Audio/Plug-Ins/" || { echo "Failed to copy AAX plugins"; exit 1; }
 fi
 
-if [[ "$PLUGIN_FORMAT" == "vst3" || "$PLUGIN_FORMAT" == "both" ]]; then
+if [[ "$PLUGIN_FORMAT" == "vst3" ]]; then
     echo "Adding VST3 plugins to package..."
     mkdir -p "$PACKAGING_STAGING_DIR/Library/Audio/Plug-Ins/VST3"
     cp -R "$VST3_RENDERER_PLUGIN_SIGNED" "$VST3_AUDIOELEMENT_PLUGIN_SIGNED" "$PACKAGING_STAGING_DIR/Library/Audio/Plug-Ins/VST3/" || { echo "Failed to copy VST3 plugins"; exit 1; }
@@ -755,15 +771,6 @@ EOF
 This package contains VST3 plugins compatible with VST3-supporting DAWs.
 
 ## Installation Locations
-• VST3 plugins: /Library/Audio/Plug-Ins/VST3
-EOF
-        ;;
-    both)
-        cat >> "$DMG_STAGING_DIR/Documentation/Documentation.txt" << EOF
-This package contains both AAX and VST3 plugins.
-
-## Installation Locations
-• AAX plugins: /Library/Application Support/Avid/Audio/Plug-Ins
 • VST3 plugins: /Library/Audio/Plug-Ins/VST3
 EOF
         ;;
