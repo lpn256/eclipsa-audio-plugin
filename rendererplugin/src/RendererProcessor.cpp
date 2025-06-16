@@ -53,9 +53,16 @@ RendererProcessor::RendererProcessor()
   // Construct processor chain.
   audioProcessors_.push_back(
       std::make_unique<GainProcessor>(&multichannelgainRepository_));
-  audioProcessors_.push_back(std::make_unique<LoudnessExportProcessor>(
-      fileExportRepository_, mixPresentationRepository_,
-      mixPresentationLoudnessRepository_, audioElementRepository_));
+  if (juce::PluginHostType().isPremiere()) {
+    audioProcessors_.push_back(
+        std::make_unique<LoudnessExport_PremiereProProcessor>(
+            fileExportRepository_, mixPresentationRepository_,
+            mixPresentationLoudnessRepository_, audioElementRepository_));
+  } else {
+    audioProcessors_.push_back(std::make_unique<LoudnessExportProcessor>(
+        fileExportRepository_, mixPresentationRepository_,
+        mixPresentationLoudnessRepository_, audioElementRepository_));
+  }
   audioProcessors_.push_back(std::make_unique<FileOutputProcessor>(
       fileExportRepository_, audioElementRepository_,
       mixPresentationRepository_, mixPresentationLoudnessRepository_));

@@ -272,7 +272,7 @@ class LoudnessExportProcessor : public ProcessorBase,
     return containers;
   }
 
- private:
+ protected:
   void copyExportContainerDataToRepo(
       const MixPresentationLoudnessExportContainer& exportContainer);
 
