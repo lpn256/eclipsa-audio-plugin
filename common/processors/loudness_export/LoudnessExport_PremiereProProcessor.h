@@ -25,6 +25,8 @@ class LoudnessExport_PremiereProProcessor : public LoudnessExportProcessor {
       MixPresentationLoudnessRepository& loudnessRepo,
       AudioElementRepository& audioElementRepo);
 
+  ~LoudnessExport_PremiereProProcessor() override;
+
   void prepareToPlay(double sampleRate, int samplesPerBlock) override;
 
   void processBlock(juce::AudioBuffer<float>& buffer,

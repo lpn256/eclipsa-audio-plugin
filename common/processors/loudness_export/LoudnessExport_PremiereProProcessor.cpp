@@ -19,6 +19,7 @@
 
 #include "data_structures/src/FileExport.h"
 #include "logger/logger.h"
+#include "processors/loudness_export/LoudnessExportProcessor.h"
 
 LoudnessExport_PremiereProProcessor::LoudnessExport_PremiereProProcessor(
     FileExportRepository& fileExportRepo,
@@ -32,8 +33,15 @@ LoudnessExport_PremiereProProcessor::LoudnessExport_PremiereProProcessor(
   LOG_ANALYTICS(0, "LoudnessExport_PremiereProProcessor instantiated.");
 }
 
+LoudnessExport_PremiereProProcessor::~LoudnessExport_PremiereProProcessor() {
+  LOG_ANALYTICS(0, "LoudnessExport_PremiereProProcessor destroyed.");
+}
+
 void LoudnessExport_PremiereProProcessor::setNonRealtime(
     bool isNonRealtime) noexcept {
+  LOG_ANALYTICS(0,
+                std::string("LoudnessExport Premiere Pro Set Non-Realtime ") +
+                    (isNonRealtime ? "true" : "false"));
   // Initialize the writer if we are rendering in offline mode
   if (isNonRealtime && !performingRender_) {
     FileExport config = fileExportRepository_.get();
@@ -68,10 +76,10 @@ void LoudnessExport_PremiereProProcessor::prepareToPlay(double sampleRate,
   int totalDuration = config.getEndTime() - config.getStartTime();
 
   estimatedSamplesToProcess_ = static_cast<int>(totalDuration * sampleRate);
-  LOG_ANALYTICS(0,
-                "PremierePro, totalDuration: " + std::to_string(totalDuration) +
-                    ", Estimated samples to process: " +
-                    std::to_string(estimatedSamplesToProcess_) + "\n");
+  LOG_ANALYTICS(0, "LoudnessExport PremierePro, totalDuration: " +
+                       std::to_string(totalDuration) +
+                       ", Estimated samples to process: " +
+                       std::to_string(estimatedSamplesToProcess_) + "\n");
 }
 
 void LoudnessExport_PremiereProProcessor::processBlock(
@@ -91,7 +99,7 @@ void LoudnessExport_PremiereProProcessor::processBlock(
     return;
   }
 
-  if (processedSamples_ < estimatedSamplesToProcess_) {
+  if (processedSamples_ <= estimatedSamplesToProcess_) {
     LOG_ANALYTICS(
         0, std::string(
                "PremierePro LoudnessExport process block is performRendering"));

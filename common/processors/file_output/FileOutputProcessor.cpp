@@ -83,7 +83,7 @@ void FileOutputProcessor::updateIamfMDFromRepository(
   switch (fileExportData.getAudioCodec()) {
     case AudioCodec::FLAC:
       IAMFExportHelper::writeFLACConfigMD(
-          numSamples_, samplesProcessed_, fileExportData.getBitDepth(),
+          numSamples_, sampleTally_, fileExportData.getBitDepth(),
           fileExportData.getFlacCompressionLevel(), iamfMD);
       break;
     case AudioCodec::OPUS:
@@ -93,7 +93,7 @@ void FileOutputProcessor::updateIamfMDFromRepository(
     case AudioCodec::LPCM:
     default:
       IAMFExportHelper::writeLPCMConfigMD(
-          numSamples_, samplesProcessed_, sampleRate_,
+          numSamples_, sampleTally_, sampleRate_,
           fileExportData.getLPCMSampleSize(), iamfMD);
       break;
   }
@@ -148,7 +148,7 @@ void FileOutputProcessor::updateIamfMDFromRepository(
         mixPresentationLoudnessRepository_.get(mixPresentationId).value();
     auto mpMDToPopulate = iamfMD.add_mix_presentation_metadata();
     mixPresentations[i]->populateIamfMixPresentationMetadata(
-        i, sampleRate_, samplesProcessed_, mpMDToPopulate, iamfMD,
+        i, sampleRate_, sampleTally_, mpMDToPopulate, iamfMD,
         mixPresentationLoudness, audioElementIDMap);
   }
 }
@@ -159,7 +159,7 @@ void FileOutputProcessor::prepareToPlay(double sampleRate,
   configParams.setSampleRate(sampleRate);
   fileExportRepository_.update(configParams);
   numSamples_ = samplesPerBlock;
-  samplesProcessed_ = 0;
+  sampleTally_ = 0;
   sampleRate_ = sampleRate;
 }
 
@@ -193,7 +193,7 @@ void FileOutputProcessor::setNonRealtime(bool isNonRealtime) noexcept {
             wavFilePath, config.getSampleRate(), config.getBitDepth(),
             config.getAudioCodec(), *audioElements[i]));
       }
-      samplesProcessed_ = 0;
+      sampleTally_ = 0;
     }
     return;
   }
@@ -298,8 +298,8 @@ void FileOutputProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   juce::ignoreUnused(midiMessages);
 
   if (performingRender_ && buffer.getNumSamples() > 0) {
-    long currentTime = samplesProcessed_ / sampleRate_;
-    long nextTime = (samplesProcessed_ + buffer.getNumSamples()) / sampleRate_;
+    long currentTime = sampleTally_ / sampleRate_;
+    long nextTime = (sampleTally_ + buffer.getNumSamples()) / sampleRate_;
 
     if ((endTime_ == 0) ||
         (currentTime >= startTime_ && nextTime <= endTime_)) {
@@ -308,7 +308,7 @@ void FileOutputProcessor::processBlock(juce::AudioBuffer<float>& buffer,
         writer->write(buffer);
       }
     }
-    samplesProcessed_ += buffer.getNumSamples();
+    sampleTally_ += buffer.getNumSamples();
   }
 }
 
