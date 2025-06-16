@@ -285,3 +285,42 @@ void AudioElementPluginEditor::setMode() {
     outputModeTypeLabel_.setText("Passthrough Mode");
   }
 }
+
+void AudioElementPluginEditor::updateTrackPropertiesFromDAW() {
+  // Get the processor to access track properties
+  AudioElementPluginProcessor* processor =
+      dynamic_cast<AudioElementPluginProcessor*>(getAudioProcessor());
+  if (!processor) return;
+
+  AudioElementPluginProcessor::TrackProperties trackProperties =
+      processor->getTrackProperties();
+  bool hasTrackNameFromDAW = processor->hasTrackNameFromDAW();
+
+  // Update the track name text box if we have automatic track name updates
+  if (hasTrackNameFromDAW && !trackProperties.name.isEmpty()) {
+    // Temporarily disable the text change callback to avoid feedback loop
+    trackNameTextBox_.onTextChanged(nullptr);
+
+    // Update the text box with the DAW name
+    trackNameTextBox_.setText(trackProperties.name);
+
+    trackNameTextBox_.onTextChanged([this]() {
+      AudioElementSpatialLayout toUpdate =
+          audioElementSpatialLayoutRepository_->get();
+      toUpdate.setName(trackNameTextBox_.getText());
+      audioElementSpatialLayoutRepository_->update(toUpdate);
+    });
+  }
+
+  trackNameTextBox_.setReadOnly(false);
+
+  // Ensure the callback is always set for manual editing
+  if (!hasTrackNameFromDAW || trackProperties.name.isEmpty()) {
+    trackNameTextBox_.onTextChanged([this]() {
+      AudioElementSpatialLayout toUpdate =
+          audioElementSpatialLayoutRepository_->get();
+      toUpdate.setName(trackNameTextBox_.getText());
+      audioElementSpatialLayoutRepository_->update(toUpdate);
+    });
+  }
+}

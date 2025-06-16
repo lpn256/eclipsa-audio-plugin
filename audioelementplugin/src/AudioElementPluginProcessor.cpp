@@ -70,13 +70,8 @@ AudioElementPluginProcessor::AudioElementPluginProcessor()
   juce::AudioChannelSet outputChannels;
   for (int i = 0; i < 28; i++) {
     outputChannels.addChannel((juce::AudioChannelSet::ChannelType)i);
-  }
-
-  // For now set a default name, later make this configurable
-  AudioElementSpatialLayout audioElementSpatialLayout =
-      audioElementSpatialLayoutRepository_.get();
-  audioElementSpatialLayout.setName("Audio");
-  audioElementSpatialLayoutRepository_.update(audioElementSpatialLayout);
+  }  // Default name will be set later in updateTrackProperties or prepareToPlay
+  // if the DAW doesn't provide a track name
 
   // Register this instance of the Audio Element plugin with the renderer plugin
   audioElementSpatialLayoutRepository_.registerListener(this);
@@ -147,6 +142,46 @@ bool AudioElementPluginProcessor::applyBusLayouts(const BusesLayout& layouts) {
   return check;
 }
 
+void AudioElementPluginProcessor::updateTrackProperties(
+    const TrackProperties& properties) {
+  {
+    const juce::ScopedLock lock(trackPropertiesLock_);
+    trackProperties_ = properties;
+
+    if (!properties.name.isEmpty()) {
+      hasTrackNameFromDAW_ = true;
+    }
+  }
+
+  // Update the track name in the AudioElementSpatialLayout if we have a
+  // non-empty name
+  if (!properties.name.isEmpty()) {
+    AudioElementSpatialLayout layout =
+        audioElementSpatialLayoutRepository_.get();
+    layout.setName(properties.name);
+    audioElementSpatialLayoutRepository_.update(layout);
+  }
+
+  // Notify the editor on the message thread
+  juce::MessageManager::callAsync([this]() {
+    if (auto* editor =
+            dynamic_cast<AudioElementPluginEditor*>(getActiveEditor())) {
+      editor->updateTrackPropertiesFromDAW();
+    }
+  });
+}
+
+AudioElementPluginProcessor::TrackProperties
+AudioElementPluginProcessor::getTrackProperties() const {
+  const juce::ScopedLock lock(trackPropertiesLock_);
+  return trackProperties_;
+}
+
+bool AudioElementPluginProcessor::hasTrackNameFromDAW() const {
+  const juce::ScopedLock lock(trackPropertiesLock_);
+  return hasTrackNameFromDAW_;
+}
+
 void AudioElementPluginProcessor::valueTreePropertyChanged(
     juce::ValueTree& treeWhosePropertyHasChanged,
     const juce::Identifier& property) {
@@ -171,6 +206,14 @@ void AudioElementPluginProcessor::prepareToPlay(double sampleRate,
   // once the REAPER has finished  probing for supported output channel sets
   allowDownSizing_ = true;
   LOG_ANALYTICS(instanceId_, "Audio Element Plugin Processor prepareToPlay \n");
+
+  // Set default name if DAW hasn't provided one and repository is empty
+  AudioElementSpatialLayout layout = audioElementSpatialLayoutRepository_.get();
+  if (layout.getName().isEmpty() && !hasTrackNameFromDAW()) {
+    layout.setName("Audio");
+    audioElementSpatialLayoutRepository_.update(layout);
+  }
+
   for (const auto& proc : audioProcessors_) {
     proc->prepareToPlay(sampleRate, samplesPerBlock);
   }

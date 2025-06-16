@@ -55,6 +55,8 @@ class AudioElementPluginEditor final : public juce::AudioProcessorEditor,
   //==============================================================================
   void setMode();
 
+  void updateTrackPropertiesFromDAW();
+
   void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                 const juce::Identifier& property) override {
     if (property == AudioElementSpatialLayout::kPanningEnabled) {

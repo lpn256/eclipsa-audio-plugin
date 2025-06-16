@@ -71,6 +71,8 @@ class AudioElementPluginProcessor final : public ProcessorBase,
   void prepareToPlay(double sampleRate, int samplesPerBlock) override;
   void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
+  void updateTrackProperties(const TrackProperties& properties) override;
+
   juce::AudioProcessorEditor* createEditor() override;
   bool hasEditor() const override { return true; }
 
@@ -86,8 +88,10 @@ class AudioElementPluginProcessor final : public ProcessorBase,
     return {audioElementSpatialLayoutRepository_, msRespository_, monitorData_,
             ambisonicsData_};
   }
-
   AudioElementParameterTree automationParametersTreeState;
+
+  TrackProperties getTrackProperties() const;
+  bool hasTrackNameFromDAW() const;
 
   inline static const ::juce::Identifier
       kAudioElementSpatialLayoutRepositoryStateKey{
@@ -121,10 +125,13 @@ class AudioElementPluginProcessor final : public ProcessorBase,
 
   juce::AudioChannelSet lastOutputChannelSet_ = juce::AudioChannelSet::mono();
   bool allowDownSizing_ = false;
-
   AudioElementPluginSyncClient syncClient_;
   SpeakerMonitorData monitorData_;
   AmbisonicsData ambisonicsData_;  // intiialized in SoundFieldProcessor
+
+  juce::CriticalSection trackPropertiesLock_;
+  TrackProperties trackProperties_;
+  bool hasTrackNameFromDAW_ = false;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioElementPluginProcessor)
 };
