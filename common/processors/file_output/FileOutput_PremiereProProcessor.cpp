@@ -16,6 +16,7 @@
 
 #include "iamf_export_utils/IAMFExportUtil.h"
 #include "logger/logger.h"
+#include "processors/file_output/FileOutputProcessor.h"
 
 FileOutput_PremiereProProcessor::FileOutput_PremiereProProcessor(
     FileExportRepository& fileExportRepository,
@@ -29,6 +30,12 @@ FileOutput_PremiereProProcessor::FileOutput_PremiereProProcessor(
       processedSamples_(0) {
   LOG_ANALYTICS(0, "FileOutput_PremiereProProcessor instantiated.");
 }
+
+FileOutput_PremiereProProcessor::~FileOutput_PremiereProProcessor() {
+  LOG_ANALYTICS(0, "FileOutput_PremiereProProcessor destroyed.");
+  FileOutputProcessor::~FileOutputProcessor();
+}
+
 void FileOutput_PremiereProProcessor::setNonRealtime(
     bool isNonRealtime) noexcept {
   LOG_ANALYTICS(0, std::string("File Output Premiere Pro Set Non-Realtime ") +

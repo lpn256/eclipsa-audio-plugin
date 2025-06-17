@@ -255,7 +255,7 @@ class LoudnessExportProcessor : public ProcessorBase,
                           MixPresentationLoudnessRepository& loudnessRepo,
                           AudioElementRepository& audioElementRepo);
 
-  ~LoudnessExportProcessor() override;
+  virtual ~LoudnessExportProcessor() override;
 
   void prepareToPlay(double sampleRate, int samplesPerBlock) override;
 
@@ -272,7 +272,6 @@ class LoudnessExportProcessor : public ProcessorBase,
     return containers;
   }
 
- protected:
   void copyExportContainerDataToRepo(
       const MixPresentationLoudnessExportContainer& exportContainer);
 
@@ -291,6 +290,7 @@ class LoudnessExportProcessor : public ProcessorBase,
 
   void intializeExportContainers();
 
+ protected:
   bool performingRender_;
 
   FileExportRepository& fileExportRepository_;

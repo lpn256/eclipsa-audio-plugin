@@ -17,7 +17,8 @@
 #pragma once
 #include "LoudnessExportProcessor.h"
 
-class LoudnessExport_PremiereProProcessor : public LoudnessExportProcessor {
+class LoudnessExport_PremiereProProcessor final
+    : public LoudnessExportProcessor {
  public:
   LoudnessExport_PremiereProProcessor(
       FileExportRepository& fileExportRepo,

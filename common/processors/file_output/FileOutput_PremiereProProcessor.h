@@ -34,6 +34,8 @@ class FileOutput_PremiereProProcessor final : public FileOutputProcessor {
       MixPresentationRepository& mixPresentationRepository,
       MixPresentationLoudnessRepository& mixPresentationLoudnessRepository);
 
+  ~FileOutput_PremiereProProcessor() override;
+
   void prepareToPlay(double sampleRate, int samplesPerBlock) override;
 
   void processBlock(juce::AudioBuffer<float>& buffer,

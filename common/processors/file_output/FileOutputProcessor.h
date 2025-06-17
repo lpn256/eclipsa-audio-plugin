@@ -44,7 +44,8 @@ class FileOutputProcessor : public ProcessorBase {
       AudioElementRepository& audioElementRepository,
       MixPresentationRepository& mixPresentationRepository,
       MixPresentationLoudnessRepository& mixPresentationLoudnessRepository);
-  ~FileOutputProcessor() override;
+
+  virtual ~FileOutputProcessor() override;
 
   //==============================================================================
   void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;

@@ -175,6 +175,8 @@ void LoudnessExportProcessor::copyExportContainerDataToRepo(
 
 void LoudnessExportProcessor::valueTreeChildAdded(
     juce::ValueTree& parentTree, juce::ValueTree& childWhichHasBeenAdded) {
+  LOG_ANALYTICS(0, "message: LoudnessExportProcessor::valueTreeChildAdded \n");
+
   // handle the case of adding a new mix presentation
   if (childWhichHasBeenAdded.getType() == MixPresentation::kTreeType) {
     // update the MixPresentationLoudness Repository by adding the new mix

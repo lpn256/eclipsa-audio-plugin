@@ -53,23 +53,29 @@ RendererProcessor::RendererProcessor()
   // Construct processor chain.
   audioProcessors_.push_back(
       std::make_unique<GainProcessor>(&multichannelgainRepository_));
-  if (juce::PluginHostType().isPremiere()) {
-    audioProcessors_.push_back(
-        std::make_unique<LoudnessExport_PremiereProProcessor>(
-            fileExportRepository_, mixPresentationRepository_,
-            mixPresentationLoudnessRepository_, audioElementRepository_));
-    audioProcessors_.push_back(
-        std::make_unique<FileOutput_PremiereProProcessor>(
-            fileExportRepository_, audioElementRepository_,
-            mixPresentationRepository_, mixPresentationLoudnessRepository_));
-  } else {
-    audioProcessors_.push_back(std::make_unique<LoudnessExportProcessor>(
-        fileExportRepository_, mixPresentationRepository_,
-        mixPresentationLoudnessRepository_, audioElementRepository_));
-    audioProcessors_.push_back(std::make_unique<FileOutputProcessor>(
-        fileExportRepository_, audioElementRepository_,
-        mixPresentationRepository_, mixPresentationLoudnessRepository_));
-  }
+  audioProcessors_.push_back(std::make_unique<LoudnessExportProcessor>(
+      fileExportRepository_, mixPresentationRepository_,
+      mixPresentationLoudnessRepository_, audioElementRepository_));
+  // if (juce::PluginHostType().isPremiere()) {
+  //   audioProcessors_.push_back(
+  //       std::make_unique<LoudnessExport_PremiereProProcessor>(
+  //           fileExportRepository_, mixPresentationRepository_,
+  //           mixPresentationLoudnessRepository_, audioElementRepository_));
+  //   audioProcessors_.push_back(
+  //       std::make_unique<FileOutput_PremiereProProcessor>(
+  //           fileExportRepository_, audioElementRepository_,
+  //           mixPresentationRepository_, mixPresentationLoudnessRepository_));
+  // } else {
+  //   audioProcessors_.push_back(std::make_unique<LoudnessExportProcessor>(
+  //       fileExportRepository_, mixPresentationRepository_,
+  //       mixPresentationLoudnessRepository_, audioElementRepository_));
+  //   audioProcessors_.push_back(std::make_unique<FileOutputProcessor>(
+  //       fileExportRepository_, audioElementRepository_,
+  //       mixPresentationRepository_, mixPresentationLoudnessRepository_));
+  // }
+  audioProcessors_.push_back(std::make_unique<FileOutputProcessor>(
+      fileExportRepository_, audioElementRepository_,
+      mixPresentationRepository_, mixPresentationLoudnessRepository_));
   channelMonitorProcessor_ =
       static_cast<ChannelMonitorProcessor*>(audioProcessors_.back().get());
   audioProcessors_.push_back(std::make_unique<RenderProcessor>(
