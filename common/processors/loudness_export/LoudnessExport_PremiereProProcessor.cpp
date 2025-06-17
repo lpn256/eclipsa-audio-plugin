@@ -35,7 +35,6 @@ LoudnessExport_PremiereProProcessor::LoudnessExport_PremiereProProcessor(
 
 LoudnessExport_PremiereProProcessor::~LoudnessExport_PremiereProProcessor() {
   LOG_ANALYTICS(0, "LoudnessExport_PremiereProProcessor destroyed.");
-  LoudnessExportProcessor::~LoudnessExportProcessor();
 }
 
 void LoudnessExport_PremiereProProcessor::setNonRealtime(

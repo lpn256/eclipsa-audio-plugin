@@ -33,7 +33,6 @@ FileOutput_PremiereProProcessor::FileOutput_PremiereProProcessor(
 
 FileOutput_PremiereProProcessor::~FileOutput_PremiereProProcessor() {
   LOG_ANALYTICS(0, "FileOutput_PremiereProProcessor destroyed.");
-  FileOutputProcessor::~FileOutputProcessor();
 }
 
 void FileOutput_PremiereProProcessor::setNonRealtime(
