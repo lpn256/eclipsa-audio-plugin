@@ -51,6 +51,9 @@ struct AudioElementPluginRepositoryCollection {
 class AudioElementPluginProcessor final : public ProcessorBase,
                                           juce::ValueTree::Listener {
  public:
+  // Import TrackProperties from the base AudioProcessor class
+  using TrackProperties = juce::AudioProcessor::TrackProperties;
+
   AudioElementPluginProcessor();
 
   static int instanceId_;  // Unique identifier for each instance of the plugin
@@ -83,15 +86,11 @@ class AudioElementPluginProcessor final : public ProcessorBase,
   void setOutputChannels(int firstChannel, int totalChannels);
 
   AudioElementPluginSyncClient& getSyncClient() { return syncClient_; }
-
   AudioElementPluginRepositoryCollection getRepositories() {
     return {audioElementSpatialLayoutRepository_, msRespository_, monitorData_,
             ambisonicsData_};
   }
   AudioElementParameterTree automationParametersTreeState;
-
-  TrackProperties getTrackProperties() const;
-  bool hasTrackNameFromDAW() const;
 
   inline static const ::juce::Identifier
       kAudioElementSpatialLayoutRepositoryStateKey{
@@ -114,7 +113,6 @@ class AudioElementPluginProcessor final : public ProcessorBase,
   MSPlaybackRepository msRespository_;
   inline static const ::juce::Identifier kMSPlaybackRepositoryStateKey{
       "ms_playback_repository_state"};
-
   /*
   Local Information
   */
@@ -122,16 +120,12 @@ class AudioElementPluginProcessor final : public ProcessorBase,
                            // Subsequent channels are output to in order up
                            // from this first channel
   int outputChannelCount;  // Replace with a real speaker layout later
-
   juce::AudioChannelSet lastOutputChannelSet_ = juce::AudioChannelSet::mono();
   bool allowDownSizing_ = false;
+
   AudioElementPluginSyncClient syncClient_;
   SpeakerMonitorData monitorData_;
   AmbisonicsData ambisonicsData_;  // intiialized in SoundFieldProcessor
-
-  juce::CriticalSection trackPropertiesLock_;
-  TrackProperties trackProperties_;
-  bool hasTrackNameFromDAW_ = false;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioElementPluginProcessor)
 };
