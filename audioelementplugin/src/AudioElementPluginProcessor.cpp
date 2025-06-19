@@ -167,20 +167,14 @@ void AudioElementPluginProcessor::valueTreePropertyChanged(
       audioElementSpatialLayout.getFirstChannel(),
       audioElementSpatialLayout.getChannelLayout().getNumChannels());
 
-  // Only sync to renderer if it's NOT a track name change
-  // Track names should remain instance-specific and not be shared between
-  // plugins
-  if (property != AudioElementSpatialLayout::kName) {
-    syncClient_.sendAudioElementSpatialLayoutRepository();
-  }
+  syncClient_.sendAudioElementSpatialLayoutRepository();
 }
 
 void AudioElementPluginProcessor::prepareToPlay(double sampleRate,
                                                 int samplesPerBlock) {
   // unrestrict the isBusesLayoutSupported function
-  // once the REAPER has finished  probing for supported output channel sets
-  // allowDownSizing_ = true;
-  LOG_ANALYTICS(instanceId_, "Audio Element Plugin Processor prepareToPlay \n");
+  // once the REAPER has finished probing for supported output channel sets
+  allowDownSizing_ = true;
 
   // Set default name if DAW hasn't provided one and repository is empty
   AudioElementSpatialLayout layout = audioElementSpatialLayoutRepository_.get();
@@ -260,22 +254,9 @@ void AudioElementPluginProcessor::setStateInformation(const void* data,
     // identify it
     AudioElementSpatialLayoutRepository tempRepository;
     tempRepository.setStateTree(audioElementSpatialLayoutTree);
-
     AudioElementSpatialLayout repositoryAudioElementSpatialLayout =
         audioElementSpatialLayoutRepository_.get();
-    AudioElementSpatialLayout tempLayout = tempRepository.get();
-
-    // Copy all values EXCEPT the name - preserve any DAW-provided track name
-    juce::String currentName = repositoryAudioElementSpatialLayout.getName();
-    repositoryAudioElementSpatialLayout.copyValuesFrom(tempLayout);
-
-    // Only restore the saved name if the current name is empty or default
-    if (currentName.isEmpty() || currentName == "Audio") {
-      repositoryAudioElementSpatialLayout.setName(tempLayout.getName());
-    } else {
-      repositoryAudioElementSpatialLayout.setName(currentName);
-    }
-
+    repositoryAudioElementSpatialLayout.copyValuesFrom(tempRepository.get());
     audioElementSpatialLayoutRepository_.update(
         repositoryAudioElementSpatialLayout);
 
