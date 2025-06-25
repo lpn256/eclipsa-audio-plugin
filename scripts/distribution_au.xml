@@ -24,7 +24,7 @@
     <options customize="allow" rootVolumeOnly="false" hostArchitectures="x86_64,arm64" />
 
     <!-- Enable both options: system-wide installation and user-specific installation -->
-    <domains enable_localSystem="true" enable_currentUserHome="true" />
+    <domains enable_localSystem="true" enable_currentUserHome="false" />
 
     <!-- Choices of what to install (default) -->
     <choices-outline>
