@@ -355,15 +355,16 @@ void RendererProcessor::initializeMixPresentations() {
     LOG_ANALYTICS(instanceId_,
                   "setStateInformation: Created a new mix presentation and set "
                   "it as active.");
-    return; // Early return since we just set a valid active mix
+    return;  // Early return since we just set a valid active mix
   }
 
   // Get the current active mix from the repository
   ActiveMixPresentation activeMix = activeMixPresentationRepository_.get();
   juce::Uuid activeMixId = activeMix.getActiveMixId();
 
-  // Set first mix as active if current active mix is invalid (null or not found)
-  if (activeMixId == juce::Uuid::null() || 
+  // Set first mix as active if current active mix is invalid (null or not
+  // found)
+  if (activeMixId == juce::Uuid::null() ||
       !mixPresentationRepository_.get(activeMixId).has_value()) {
     activeMixPresentationRepository_.update(mixPresentations[0]->getId());
     LOG_ANALYTICS(

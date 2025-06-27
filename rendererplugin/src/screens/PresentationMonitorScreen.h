@@ -32,8 +32,10 @@ class CustomTabbedComponent : public juce::TabbedComponent {
 
   void currentTabChanged(int newCurrentTabIndex,
                          const juce::String& newCurrentTabName) override;
-  
-  void setTabRestorationMode(bool isRestoring) { isRestoringTabs_ = isRestoring; }
+
+  void setTabRestorationMode(bool isRestoring) {
+    isRestoringTabs_ = isRestoring;
+  }
 
  private:
   bool isRestoringTabs_ = false;
