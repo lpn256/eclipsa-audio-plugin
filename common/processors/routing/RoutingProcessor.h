@@ -21,6 +21,7 @@
 #include "data_repository/implementation/AudioElementSpatialLayoutRepository.h"
 #include "data_structures/src/AudioElementPluginSyncClient.h"
 #include "data_structures/src/AudioElementSpatialLayout.h"
+#include "logger/logger.h"
 
 //==============================================================================
 class RoutingProcessor final : public ProcessorBase,
@@ -43,7 +44,12 @@ class RoutingProcessor final : public ProcessorBase,
   const juce::String getName() { return "Audio Element Plugin Router"; }
 
   //==============================================================================
-  void audioElementsUpdated() { initializeRouting(); }
+  void audioElementsUpdated() {
+    LOG_INFO(0,
+             "RoutingProcessor: audioElementsUpdated() called - "
+             "re-initializing routing");
+    initializeRouting();
+  }
 
   void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                 const juce::Identifier& property) override {

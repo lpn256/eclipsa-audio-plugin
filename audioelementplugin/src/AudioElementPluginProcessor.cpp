@@ -162,6 +162,9 @@ void AudioElementPluginProcessor::valueTreePropertyChanged(
   setOutputChannels(
       audioElementSpatialLayout.getFirstChannel(),
       audioElementSpatialLayout.getChannelLayout().getNumChannels());
+
+  // Try to send the repository data, but don't force reconnection here
+  // as it can cause threading issues. The sync client has its own retry logic.
   syncClient_.sendAudioElementSpatialLayoutRepository();
 }
 

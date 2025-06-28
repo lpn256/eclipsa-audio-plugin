@@ -70,6 +70,8 @@ class AudioElementPluginSyncClient : public juce::InterprocessConnection {
         listeners_.end());
   }
 
+  bool isConnected() const { return connected_.load(); }
+
   void getAudioElements(juce::OwnedArray<AudioElement>& elements) {
     juce::ScopedLock lock(rendererAudioElementsLock_);
     juce::OwnedArray<AudioElement> elementsInternal;
