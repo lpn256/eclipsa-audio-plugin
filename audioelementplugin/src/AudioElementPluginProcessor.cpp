@@ -271,19 +271,21 @@ void AudioElementPluginProcessor::setStateInformation(const void* data,
     automationParametersTreeState.replaceState(automationTree);
   }
 
-  // after loading state, re-apply saved routing and notify renderer
+  // after restoring state, reapply routing and notify renderer
   {
-    // 1) apply output channel layout
-    AudioElementSpatialLayout layout = audioElementSpatialLayoutRepository_.get();
+    // apply output channel layout
+    AudioElementSpatialLayout layout =
+        audioElementSpatialLayoutRepository_.get();
     setOutputChannels(layout.getFirstChannel(),
                       layout.getChannelLayout().getNumChannels());
 
-    // 2) broadcast layout to renderer
+    // broadcast layout to renderer
     syncClient_.sendAudioElementSpatialLayoutRepository();
 
-    // 3) re-initialize routing processors
-    for (auto& proc : audioProcessors_)
+    // re-initialize routing processors
+    for (auto& proc : audioProcessors_) {
       if (auto* router = dynamic_cast<RoutingProcessor*>(proc.get()))
         router->initializeRouting();
+    }
   }
 }

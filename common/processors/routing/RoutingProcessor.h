@@ -70,10 +70,10 @@ class RoutingProcessor final : public ProcessorBase,
 
   //==============================================================================
 
-public:
+ public:
   void initializeRouting();
-private:
 
+ private:
   AudioElementSpatialLayoutRepository* audioElementSpatialLayoutData_;
   AudioElementPluginSyncClient* syncClient_;
 
