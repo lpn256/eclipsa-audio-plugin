@@ -247,14 +247,7 @@ void RendererProcessor::setStateInformation(const void* data, int sizeInBytes) {
     }
   }
 
-  // broadcast initial element list/layout to plugins after state load
-  syncServer_.updateClients();
-
-  // rebuild RenderProcessor instances now that state is loaded
-  for (auto& proc : audioProcessors_) {
-    if (auto* renderProc = dynamic_cast<RenderProcessor*>(proc.get()))
-      renderProc->initializeRenderers();
-  }
+  reinitializeAfterStateRestore();
 }
 
 void RendererProcessor::updateRepositories() {
@@ -418,4 +411,14 @@ void RendererProcessor::configureOutputBus() {
   busesLayout.outputBuses.add(outputChannelSet_);
 
   setBusesLayout(busesLayout);
+}
+
+void RendererProcessor::reinitializeAfterStateRestore() {
+  // Broadcast initial element list/layout to plugins after state load
+  syncServer_.updateClients();
+
+  for (auto& proc : audioProcessors_) {
+    if (auto* renderProc = dynamic_cast<RenderProcessor*>(proc.get()))
+      renderProc->reinitializeAfterStateRestore();
+  }
 }

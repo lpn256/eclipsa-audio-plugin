@@ -126,5 +126,7 @@ class AudioElementPluginProcessor final : public ProcessorBase,
   SpeakerMonitorData monitorData_;
   AmbisonicsData ambisonicsData_;  // intiialized in SoundFieldProcessor
 
+  void reinitializeAfterStateRestore();
+
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioElementPluginProcessor)
 };

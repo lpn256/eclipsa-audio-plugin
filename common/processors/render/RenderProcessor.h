@@ -138,6 +138,9 @@ class RenderProcessor final : public ProcessorBase, juce::ValueTree::Listener {
   int getSpeakersOut() { return speakersOut_; }
 
  public:
+  void reinitializeAfterStateRestore() { initializeRenderers(); }
+
+ private:
   void initializeRenderers();
 
  private:

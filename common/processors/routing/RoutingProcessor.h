@@ -71,6 +71,9 @@ class RoutingProcessor final : public ProcessorBase,
   //==============================================================================
 
  public:
+  void reinitializeAfterStateRestore() { initializeRouting(); }
+
+ private:
   void initializeRouting();
 
  private:
