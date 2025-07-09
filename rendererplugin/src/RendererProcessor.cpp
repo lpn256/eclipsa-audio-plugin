@@ -246,6 +246,9 @@ void RendererProcessor::setStateInformation(const void* data, int sizeInBytes) {
       setNonRealtime(true);
     }
   }
+
+  // broadcast initial element list/layout to plugins after state load
+  syncServer_.updateClients();
 }
 
 void RendererProcessor::updateRepositories() {
