@@ -139,6 +139,7 @@ class RenderProcessor final : public ProcessorBase, juce::ValueTree::Listener {
 
  public:
   void initializeRenderers();
+
  private:
   void mixRenderedAudio(const bool mixFromBinaural, const int numSourceChannels,
                         juce::AudioBuffer<float>& outputBuffer);
