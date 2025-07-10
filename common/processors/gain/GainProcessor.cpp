@@ -70,7 +70,8 @@ void GainProcessor::setGain(const int& channel, const float& gainValue) {
 
 void GainProcessor::ResetGains() {
   // the new ChannelGains object will have a default gain of 1.f
-  channelGains_->update(ChannelGains(gainrepo_id_, "multichannel_Gains", 28));
+  channelGains_->update(ChannelGains(gainrepo_id_, "multichannel_Gains",
+                                     getHostWideLayout().size()));
 }
 
 //==============================================================================
@@ -110,37 +111,15 @@ GainProcessor::InitializeGainParameters() {
 }
 
 void GainProcessor::updateAllAudioParameterFloats() {
-  for (int i = 0; i < channelGains_->get().getGains().size(); i++) {
-    *gains_[i] = channelGains_->get().getGains()[i];
+  ChannelGains copy = channelGains_->get();
+  std::vector<float> gains = copy.getGains();
+  for (int i = 0; i < gains.size(); i++) {
+    *gains_[i] = gains[i];
   }
 }
 
 void GainProcessor::valueTreePropertyChanged(juce::ValueTree& tree,
                                              const juce::Identifier& property) {
-  juce::ignoreUnused(tree);
-  updateAllAudioParameterFloats();
-}
-
-void GainProcessor::valueTreeChildAdded(juce::ValueTree& parent,
-                                        juce::ValueTree& child) {
-  juce::ignoreUnused(parent);
-}
-
-void GainProcessor::valueTreeChildRemoved(juce::ValueTree& parent,
-                                          juce::ValueTree& child, int index) {
-  juce::ignoreUnused(parent);
-}
-
-void GainProcessor::valueTreeChildOrderChanged(juce::ValueTree& parent,
-                                               int oldIndex, int newIndex) {
-  juce::ignoreUnused(parent);
-}
-
-void GainProcessor::valueTreeParentChanged(juce::ValueTree& tree) {
-  juce::ignoreUnused(tree);
-}
-
-void GainProcessor::valueTreeRedirected(juce::ValueTree& tree) {
   juce::ignoreUnused(tree);
   updateAllAudioParameterFloats();
 }

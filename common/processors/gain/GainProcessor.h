@@ -58,15 +58,6 @@ class GainProcessor final : public ProcessorBase,
 
   virtual void valueTreePropertyChanged(
       juce::ValueTree& tree, const juce::Identifier& property) override;
-  virtual void valueTreeChildAdded(juce::ValueTree& parent,
-                                   juce::ValueTree& child) override;
-  virtual void valueTreeChildRemoved(juce::ValueTree& parent,
-                                     juce::ValueTree& child,
-                                     int index) override;
-  virtual void valueTreeChildOrderChanged(juce::ValueTree& parent, int oldIndex,
-                                          int newIndex) override;
-  virtual void valueTreeParentChanged(juce::ValueTree& tree) override;
-  virtual void valueTreeRedirected(juce::ValueTree& tree) override;
 
   int getGainRepoInputChannels() {
     return channelGains_->get().getTotalChannels();
