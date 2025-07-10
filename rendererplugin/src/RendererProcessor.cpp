@@ -473,8 +473,8 @@ void RendererProcessor::reinitializeAfterStateRestore() {
   // Broadcast initial element list/layout to plugins after state load
   syncServer_.updateClients();
 
+  // Notify and reinitialize all child processors as needed
   for (auto& proc : audioProcessors_) {
-    if (auto* renderProc = dynamic_cast<RenderProcessor*>(proc.get()))
-      renderProc->reinitializeAfterStateRestore();
+    proc->reinitializeAfterStateRestore();
   }
 }

@@ -74,9 +74,7 @@ class RendererProcessor final : public ProcessorBase,
   //==============================================================================
   void getStateInformation(juce::MemoryBlock& destData) override;
   void setStateInformation(const void* data, int sizeInBytes) override;
-
- private:
-  void reinitializeAfterStateRestore();
+  void reinitializeAfterStateRestore() override;
 
  public:
   juce::AudioProcessorEditor* getFileEditor() const;

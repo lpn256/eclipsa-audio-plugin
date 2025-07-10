@@ -284,9 +284,8 @@ void AudioElementPluginProcessor::reinitializeAfterStateRestore() {
   // Broadcast layout to renderer
   syncClient_.sendAudioElementSpatialLayoutRepository();
 
-  // Re-initialize routing processors
+  // Re-initialize all child processors that require post-state setup
   for (auto& proc : audioProcessors_) {
-    if (auto* router = dynamic_cast<RoutingProcessor*>(proc.get()))
-      router->reinitializeAfterStateRestore();
+    proc->reinitializeAfterStateRestore();
   }
 }
