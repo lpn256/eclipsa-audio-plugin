@@ -67,11 +67,18 @@ class GainProcessor final : public ProcessorBase,
     return gains_;
   }
 
+  void reinitializeAfterStateRestore() override { updateGains(); }
+
   void toggleChannelMute(const int& channel);
 
   void ResetGains();
 
   void updateAllAudioParameterFloats();
+
+  void updateGains() {
+    updateAllAudioParameterFloats();
+    channelGainsDSP_ = InitializeChannelGainsDSPs();
+  }
 
   std::unordered_map<int, float> getMutedChannelsfromRepo() {
     return channelGains_->get().getMutedChannels();

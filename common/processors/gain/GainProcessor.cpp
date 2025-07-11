@@ -39,8 +39,7 @@ const juce::String GainProcessor::getName() const { return {"Gain"}; }
 
 //==============================================================================
 void GainProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
-  updateAllAudioParameterFloats();
-  channelGainsDSP_ = InitializeChannelGainsDSPs();
+  updateGains();
   m_samplesPerBlock_ = samplesPerBlock;
   for (auto i = 0; i < channelGainsDSP_.size(); ++i) {
     channelGainsDSP_[i].prepare(
@@ -134,8 +133,7 @@ void GainProcessor::updateAllAudioParameterFloats() {
 void GainProcessor::valueTreePropertyChanged(juce::ValueTree& tree,
                                              const juce::Identifier& property) {
   juce::ignoreUnused(tree);
-  updateAllAudioParameterFloats();
-  InitializeChannelGainsDSPs();
+  updateGains();
 }
 
 void GainProcessor::toggleChannelMute(const int& channel) {
