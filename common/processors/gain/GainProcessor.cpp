@@ -15,6 +15,7 @@
 #include "GainProcessor.h"
 
 #include "GainEditor.h"
+#include "logger/logger.h"
 
 //==============================================================================
 GainProcessor::GainProcessor(MultiChannelRepository* gainRepository)
@@ -45,6 +46,17 @@ void GainProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
         {sampleRate, static_cast<uint32_t>(samplesPerBlock),
          static_cast<uint32_t>(channelGainsDSP_.size())});
   }
+  LOG_ANALYTICS(
+      0, "PrepareToPlay GainProcessor, gain repo: \n" +
+             channelGains_->get().toValueTree().toXmlString().toStdString());
+
+  std::string channelGainDSPsInfo = "Channel Gains DSPs:\n";
+  for (int i = 0; i < channelGainsDSP_.size(); i++) {
+    channelGainDSPsInfo +=
+        "Channel " + std::to_string(i) +
+        " Gain: " + std::to_string(channelGainsDSP_[i].getGainLinear()) + "\n";
+  }
+  LOG_ANALYTICS(0, channelGainDSPsInfo);
 }
 
 void GainProcessor::processBlock(juce::AudioBuffer<float>& buffer,
