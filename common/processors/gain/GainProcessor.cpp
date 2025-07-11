@@ -38,6 +38,7 @@ const juce::String GainProcessor::getName() const { return {"Gain"}; }
 
 //==============================================================================
 void GainProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
+  updateAllAudioParameterFloats();
   m_samplesPerBlock_ = samplesPerBlock;
   for (auto i = 0; i < channelGainsDSP_.size(); ++i) {
     channelGainsDSP_[i].prepare(
