@@ -15,7 +15,6 @@
 #include "GainProcessor.h"
 
 #include "GainEditor.h"
-#include "logger/logger.h"
 
 //==============================================================================
 GainProcessor::GainProcessor(MultiChannelRepository* gainRepository)
