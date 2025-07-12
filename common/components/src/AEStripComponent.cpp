@@ -360,10 +360,9 @@ void AEStripComponent::determineSoloMuteButtonColours() {
 void AEStripComponent::valueTreeChildAdded(
     juce::ValueTree& parentTree, juce::ValueTree& childWhichHasBeenAdded) {
   juce::Uuid parentID = juce::Uuid(parentTree[MixPresentationSoloMute::kId]);
-  juce::Uuid childID =
-      juce::Uuid(childWhichHasBeenAdded[MixPresentationSoloMute::kId]);
   juce::Uuid activeMixID = activeMixRepository_->get().getActiveMixId();
-  // if the parent tree is not the
+  // only update if the AE Strip belongs to the mix presentation that was
+  // changed or if the current mix presentation is the active mix
   if (parentID != mixPresID_ || parentID != activeMixID) {
     return;
   }
