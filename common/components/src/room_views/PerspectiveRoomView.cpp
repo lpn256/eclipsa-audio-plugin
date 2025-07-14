@@ -23,7 +23,8 @@ PerspectiveRoomView::PerspectiveRoomView(
     const std::unordered_set<SpeakerLookup::SpeakerTag>& hiddenSpeakers,
     const juce::Image& figure, const SpeakerMonitorData& monitorData,
     RepositoryCollection repos)
-    : kFaces_(faces),
+    : kTransformMat_(transformMat),
+      kFaces_(faces),
       kHiddenSpeakers_(hiddenSpeakers),
       transformedFaces_(std::vector<DrawableFace>(faces.size())),
       monitorData_(monitorData),
