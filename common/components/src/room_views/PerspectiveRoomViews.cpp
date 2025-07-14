@@ -100,7 +100,7 @@ AudioElementPluginRearView::AudioElementPluginRearView(
           {SpeakerLookup::kLTB, SpeakerLookup::kRTB, SpeakerLookup::kLFE,
            SpeakerLookup::kTPBL, SpeakerLookup::kTPBR, SpeakerLookup::kBL,
            SpeakerLookup::kBR},
-          {}, monitorData){};
+          {}, monitorData) {};
 
 const float AudioElementPluginRearView::getTrackScaling(
     const Coordinates::Point4D pt) const {
