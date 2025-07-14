@@ -21,7 +21,7 @@ TopView::TopView(const SpeakerMonitorData& monitorData,
     : PerspectiveRoomView(
           FaceLookup::getFaces(FaceLookup::kTop),
           Coordinates::getTopViewTransform(), {SpeakerLookup::kLFE},
-          IconStore::getInstance().getTopIcon(), monitorData, repos){};
+          IconStore::getInstance().getTopIcon(), monitorData, repos) {};
 
 const float TopView::getTrackScaling(const Coordinates::Point4D pt) const {
   return 0.35 * pt.a[FaceLookup::kAxisY] + 1.35;
@@ -35,7 +35,7 @@ SideView::SideView(const SpeakerMonitorData& monitorData,
           {SpeakerLookup::kLS, SpeakerLookup::kLSS, SpeakerLookup::kLRS,
            SpeakerLookup::kLTR, SpeakerLookup::kLFE, SpeakerLookup::kFL,
            SpeakerLookup::kSIL},
-          IconStore::getInstance().getLeftIcon(), monitorData, repos){};
+          IconStore::getInstance().getLeftIcon(), monitorData, repos) {};
 
 const float SideView::getTrackScaling(const Coordinates::Point4D pt) const {
   return -0.35 * pt.a[FaceLookup::kAxisX] + 1.35;
@@ -49,7 +49,7 @@ RearView::RearView(const SpeakerMonitorData& monitorData,
           {SpeakerLookup::kLTB, SpeakerLookup::kRTB, SpeakerLookup::kLFE,
            SpeakerLookup::kTPBL, SpeakerLookup::kTPBR, SpeakerLookup::kBL,
            SpeakerLookup::kBR},
-          IconStore::getInstance().getBackIcon(), monitorData, repos){};
+          IconStore::getInstance().getBackIcon(), monitorData, repos) {};
 
 const float RearView::getTrackScaling(const Coordinates::Point4D pt) const {
   return 0.35 * pt.a[FaceLookup::kAxisZ] + 1.35;
@@ -60,7 +60,7 @@ IsoView::IsoView(const SpeakerMonitorData& monitorData,
     : PerspectiveRoomView(
           FaceLookup::getFaces(FaceLookup::kIso),
           Coordinates::getIsoViewTransform(), {SpeakerLookup::kLFE},
-          IconStore::getInstance().getIsoIcon(), monitorData, repos){};
+          IconStore::getInstance().getIsoIcon(), monitorData, repos) {};
 
 void IsoView::drawFace(const std::array<Coordinates::Point2D, 4>& faceVerts,
                        const juce::Colour& c, juce::Graphics& g) {
