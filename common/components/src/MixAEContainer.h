@@ -52,7 +52,7 @@ class MixAEContainer : public juce::Component {
     tooltipImage_.setImage(IconStore::getInstance().getTooltipIcon());
     tooltipImage_.setTooltip(
         "Binaural Playback\n\n"
-        "Set the audio element to be binaural. ");
+        "Play the audio element back as binaural.");
 
     addAndMakeVisible(tooltipImage_);
   }
