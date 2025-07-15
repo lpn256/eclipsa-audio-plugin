@@ -24,7 +24,7 @@
 class MixAEContainer : public juce::Component {
  public:
   MixAEContainer(const juce::String& title, const juce::String& desc)
-      : name_(title), desc_(desc), isBinauralCheckbox_("Binaural") {
+      : name_(title), desc_(desc), isBinauralCheckbox_("Include Binaural") {
     nameLabel_.setText(name_, juce::dontSendNotification);
     nameLabel_.setColour(juce::Label::textColourId,
                          EclipsaColours::headingGrey);
@@ -51,8 +51,9 @@ class MixAEContainer : public juce::Component {
     // Configure the tooltip image
     tooltipImage_.setImage(IconStore::getInstance().getTooltipIcon());
     tooltipImage_.setTooltip(
-        "Binaural Playback\n\n"
-        "Play the audio element back as binaural.");
+        "Include Binaural\n\n"
+        "When checked, this audio element will be included in binaural "
+        "playback.");
 
     addAndMakeVisible(tooltipImage_);
   }
@@ -95,7 +96,7 @@ class MixAEContainer : public juce::Component {
     bounds.reduce(toRemove, toRemove);
 
     const float tooltipImageWidth = 0.04f;
-    const float binauralCheckboxWidth = 0.12f;
+    const float binauralCheckboxWidth = 0.18f;
 
     auto tooltipImageBounds = bounds.removeFromRight(
         mixAEContainerBounds.proportionOfWidth(tooltipImageWidth));
