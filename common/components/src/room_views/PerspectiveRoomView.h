@@ -113,6 +113,8 @@ class PerspectiveRoomView : public juce::Component {
 
   // Data sources. //
   const SpeakerMonitorData& monitorData_;
+  const bool rendererPlugin_;  // if true the perspective room view is used
+                               // in the renderer plugin.
   MixPresentationSoloMuteRepository* mixPresSMRepo_;
   ActiveMixRepository* activeMixRepo_;
   MultibaseAudioElementSpatialLayoutRepository* aeslRepo_;

@@ -28,6 +28,8 @@ PerspectiveRoomView::PerspectiveRoomView(
       kHiddenSpeakers_(hiddenSpeakers),
       transformedFaces_(std::vector<DrawableFace>(faces.size())),
       monitorData_(monitorData),
+      rendererPlugin_(
+          true),  // Set to true if this is used in the renderer plugin.
       mixPresSMRepo_(&repos.mpSMRepo_),
       activeMixRepo_(&repos.activeMPRepo_),
       aeslRepo_(&repos.audioElementSpatialLayoutRepo_) {
@@ -45,7 +47,12 @@ PerspectiveRoomView::PerspectiveRoomView(
       kFaces_(faces),
       kHiddenSpeakers_(hiddenSpeakers),
       transformedFaces_(std::vector<DrawableFace>(faces.size())),
-      monitorData_(monitorData) {
+      monitorData_(monitorData),
+      rendererPlugin_(
+          false),  // Set to false if this is not used in the renderer plugin.
+      mixPresSMRepo_(nullptr),
+      activeMixRepo_(nullptr),
+      aeslRepo_(nullptr) {
   imageComponent_.setImage(figure);
   addAndMakeVisible(imageComponent_);
   setSpeakers(Speakers::kStereo);
@@ -138,8 +145,7 @@ void PerspectiveRoomView::transformDynamicVertices() {
   transformedTracks_.clear();
 
   MixPresentationSoloMute mixPresSoloMute;
-  if (mixPresSMRepo_ != nullptr && activeMixRepo_ != nullptr &&
-      aeslRepo_ != nullptr) {
+  if (rendererPlugin_) {
     juce::Uuid activeMix = activeMixRepo_->get().getActiveMixId();
     mixPresSoloMute = mixPresSMRepo_->get(activeMix).value();
   }
@@ -147,8 +153,7 @@ void PerspectiveRoomView::transformDynamicVertices() {
     DrawableTrack newTrack;
     Coordinates::Point4D pt = {data.x / 50, data.z / 50, -data.y / 50, 1.f};
     newTrack.pos = Coordinates::toWindow(kTransformMat_, wData, pt);
-    if (mixPresSMRepo_ != nullptr && activeMixRepo_ != nullptr &&
-        aeslRepo_ != nullptr) {
+    if (rendererPlugin_) {
       newTrack.trackLoudness = assignTrackLoudness(data, mixPresSoloMute);
     } else {
       newTrack.trackLoudness = data.loudness;
