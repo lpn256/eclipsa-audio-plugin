@@ -15,26 +15,35 @@
 #include "RenderProcessor.h"
 
 #include <cstddef>
+#include <ranges>
 
 #include "data_repository/implementation/AudioElementRepository.h"
 #include "data_repository/implementation/RoomSetupRepository.h"
 #include "data_structures/src/AudioElement.h"
+#include "data_structures/src/MixPresentation.h"
 #include "data_structures/src/RoomSetup.h"
+#include "juce_core/system/juce_PlatformDefs.h"
+#include "logger/logger.h"
 #include "substream_rdr/rdr_factory/Renderer.h"
 #include "substream_rdr/substream_rdr_utils/Speakers.h"
 
 AudioElementRenderer::AudioElementRenderer(
     Speakers::AudioElementSpeakerLayout inputLayout,
     Speakers::AudioElementSpeakerLayout playbackLayout, int firstInputChannel,
-    int samplesPerBlock, int sampleRate)
+    int samplesPerBlock, int sampleRate, bool isBinaural)
     : inputData(inputLayout.getNumChannels(), samplesPerBlock),
       outputData(playbackLayout.getNumChannels(), samplesPerBlock),
       outputDataBinaural(Speakers::kBinaural.getNumChannels(), samplesPerBlock),
       firstChannel(firstInputChannel),
-      inputLayout(inputLayout) {
+      inputLayout(inputLayout),
+      kIsBinaural(isBinaural) {
   renderer = createRenderer(inputLayout, playbackLayout);
-  rendererBinaural = createRenderer(inputLayout, Speakers::kBinaural,
-                                    samplesPerBlock, sampleRate);
+  if (kIsBinaural) {
+    rendererBinaural = createRenderer(inputLayout, Speakers::kBinaural,
+                                      samplesPerBlock, sampleRate);
+  } else {
+    rendererBinaural = createRenderer(inputLayout, Speakers::kStereo);
+  }
 }
 
 //==============================================================================
@@ -106,6 +115,8 @@ void RenderProcessor::initializeRenderers() {
   std::vector<MixPresentationAudioElement> mixPresAEs =
       activeMixPres->getAudioElements();
 
+  // boilerplate ensures that each MixPresentationAudioElement is in the
+  // AudioElementRepository
   std::vector<AudioElement> activeAudioElements;
   for (int i = 0; i < mixPresAEs.size(); ++i) {
     std::optional<AudioElement> ae =
@@ -113,8 +124,15 @@ void RenderProcessor::initializeRenderers() {
 
     if (ae) {
       activeAudioElements.push_back(ae.value());
+    } else {
+      LOG_ERROR(0, "Failed to retrieve mixPresentationAudioElement with ID: " +
+                       mixPresAEs[i].getId().toString().toStdString() +
+                       " from the audio element repository.");
     }
   }
+
+  jassert(activeAudioElements.size() ==
+          mixPresAEs.size());  // Ensure we have all audio elements.
 
   // Get the room's speaker layout
   auto roomSpeakerLayout = roomSetupData_->get().getSpeakerLayout();
@@ -128,7 +146,10 @@ void RenderProcessor::initializeRenderers() {
                              currentSamplesPerBlock_, false, true, true);
 
   // Create a renderer for each audio element
-  for (const AudioElement& audioElement : activeAudioElements) {
+  for (int i = 0; i < activeAudioElements.size(); ++i) {
+    const AudioElement& audioElement = activeAudioElements[i];
+    const MixPresentationAudioElement& mixPresAudioElement =
+        mixPresAEs[i];  // Get the corresponding MixPresentationAudioElement
     Speakers::AudioElementSpeakerLayout audioElementLayout =
         audioElement.getChannelConfig();
 
@@ -141,7 +162,8 @@ void RenderProcessor::initializeRenderers() {
     audioElementRenderers_.push_back(new AudioElementRenderer(
         audioElementLayout,
         roomSetupData_->get().getSpeakerLayout().getRoomSpeakerLayout(),
-        firstChannel, currentSamplesPerBlock_, currentSampleRate_));
+        firstChannel, currentSamplesPerBlock_, currentSampleRate_,
+        mixPresAudioElement.isBinaural()));
   }
 
   // Set up the input and output buffers
