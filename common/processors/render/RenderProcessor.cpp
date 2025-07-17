@@ -283,10 +283,16 @@ void RenderProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 void RenderProcessor::updateBinauralLoudness(
     juce::AudioBuffer<float>& rdrdAudio) {
   std::array<float, 2> loudnesses;
-  for (int i = 0; i < 2; ++i) {
-    loudnesses[i] = 20.0f * std::log10(rdrdAudio.getRMSLevel(
-                                i, 0, rdrdAudio.getNumSamples()));
+  if (rdrdAudio.getNumChannels() < 2) {
+    loudnesses[0] = -300.f;
+    loudnesses[1] = -300.f;
+  } else {
+    for (int i = 0; i < 2; ++i) {
+      loudnesses[i] = 20.0f * std::log10(rdrdAudio.getRMSLevel(
+                                  i, 0, rdrdAudio.getNumSamples()));
+    }
   }
+
   monitorData_.binauralLoudness.update(loudnesses);
 }
 

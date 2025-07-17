@@ -62,7 +62,7 @@ struct AudioElementRenderer {
   AudioElementRenderer(Speakers::AudioElementSpeakerLayout inputLayout,
                        Speakers::AudioElementSpeakerLayout playbackLayout,
                        int firstInputChannel, int samplesPerBlock,
-                       int sampleRate, bool isBinaural);
+                       int sampleRate, bool isBinaural = true);
 };
 
 //==============================================================================
