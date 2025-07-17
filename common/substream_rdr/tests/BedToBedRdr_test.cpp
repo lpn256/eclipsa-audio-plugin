@@ -62,12 +62,7 @@ TEST(test_b2b_rdr, construct_rdr) {
     for (const auto out : playbackLayouts) {
       // If the input layout is the same as the output layout a renderer need
       // not be constructed.
-      if (in == out) {
-        ASSERT_TRUE(BedToBedRdr::createBedToBedRdr(in, out) == nullptr);
-
-      } else {
-        ASSERT_TRUE(BedToBedRdr::createBedToBedRdr(in, out) != nullptr);
-      }
+      ASSERT_TRUE(BedToBedRdr::createBedToBedRdr(in, out) != nullptr);
     }
   }
 }
