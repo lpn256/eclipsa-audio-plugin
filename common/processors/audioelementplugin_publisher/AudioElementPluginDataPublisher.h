@@ -24,17 +24,20 @@
 #include "data_structures/src/AudioElementCommunication.h"
 #include "data_structures/src/AudioElementParameterTree.h"
 #include "data_structures/src/ParameterMetaData.h"
+#include "data_structures/src/SpeakerMonitorData.h"
 
 //==============================================================================
 class AudioElementPluginDataPublisher final
     : public ProcessorBase,
       juce::ValueTree::Listener,
-      public juce::AudioProcessorValueTreeState::Listener {
+      public juce::AudioProcessorValueTreeState::Listener,
+      public juce::Timer {
  public:
   //==============================================================================
   AudioElementPluginDataPublisher(
       AudioElementSpatialLayoutRepository* audioElementSpatialLayoutRepository,
-      AudioElementParameterTree* automationParameterTree);
+      AudioElementParameterTree* automationParameterTree,
+      SpeakerMonitorData& monitorData);
   ~AudioElementPluginDataPublisher() override;
 
   //==============================================================================
@@ -87,10 +90,12 @@ class AudioElementPluginDataPublisher final
   //==============================================================================
 
  private:
+  void timerCallback() override;
   void updateData();
 
   AudioElementSpatialLayoutRepository* audioElementSpatialLayoutData_;
   AudioElementParameterTree* automationParameterTree_;
+  SpeakerMonitorData& monitorData_;
   bool dataChanged_;
   AudioElementUpdateData localData_;
   std::unique_ptr<AudioElementPublisher> publisher_;
