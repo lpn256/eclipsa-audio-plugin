@@ -15,7 +15,7 @@
  */
 
 #pragma once
-#include <ADMRenderer.h>
+#include <AdmRenderer.h>
 #include <juce_audio_basics/juce_audio_basics.h>
 
 #include "AudioPanner.h"
