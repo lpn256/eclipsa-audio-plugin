@@ -14,7 +14,6 @@
 
 #include "MixPresentation.h"
 
-#include <_types/_uint32_t.h>
 #include <juce_core/juce_core.h>
 
 #include <string>
