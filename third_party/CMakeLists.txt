@@ -40,7 +40,7 @@ set(SAF_BUILD_TESTS 0)
 set(saf_example_list ambi_dec) #the ambisonic decoder example
 set(SAF_BUILD_EXAMPLES 1) # only builds the examples in saf_example_list
 # Manually set the SAF_PERFORMANCE_LIB variable
-set(SAF_PERFORMANCE_LIB "SAF_USE_APPLE_ACCELERATE")
+set(SAF_PERFORMANCE_LIB "SAF_USE_INTEL_MKL_LP64")
 add_subdirectory(Spatial_Audio_Framework)
 # gpac for AV muxing
 add_subdirectory(gpac)
