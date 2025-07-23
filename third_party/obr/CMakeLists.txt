@@ -9,17 +9,17 @@ include("${CMAKE_SOURCE_DIR}/cmake/eigen.cmake") # Fetch Eigen for compilation d
 include("${CMAKE_SOURCE_DIR}/cmake/pffft.cmake")
 target_include_directories(obr INTERFACE "." "./obr" "./obr/renderer" "./obr/ambisonic_encoder")
 
-add_library(obr_dylib SHARED IMPORTED)
-set_target_properties(obr_dylib PROPERTIES
-  IMPORTED_LOCATION         "${CMAKE_CURRENT_LIST_DIR}/lib/obr.dylib"
-  IMPORTED_LOCATION_DEBUG   "${CMAKE_CURRENT_LIST_DIR}/lib/obr.dylib"
-  IMPORTED_LOCATION_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/obr.dylib"
-  IMPORTED_LOCATION_RELWITHDEBINFO "${CMAKE_CURRENT_LIST_DIR}/lib/obr.dylib"
-  IMPORTED_SONAME "obr.dylib"
+add_library(obr_obj SHARED IMPORTED)
+set_target_properties(obr_obj PROPERTIES
+  IMPORTED_LOCATION         "${CMAKE_CURRENT_LIST_DIR}/lib/obr.so"
+  IMPORTED_LOCATION_DEBUG   "${CMAKE_CURRENT_LIST_DIR}/lib/obr.so"
+  IMPORTED_LOCATION_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/obr.so"
+  IMPORTED_LOCATION_RELWITHDEBINFO "${CMAKE_CURRENT_LIST_DIR}/lib/obr.so"
+  IMPORTED_SONAME "obr.so"
   LINKER_LANGUAGE CXX)
 
 target_link_libraries(obr 
   INTERFACE 
-  obr_dylib
+  obr_obj
     Eigen
     pffft)
