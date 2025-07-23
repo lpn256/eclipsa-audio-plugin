@@ -11,11 +11,11 @@ target_include_directories(obr INTERFACE "." "./obr" "./obr/renderer" "./obr/amb
 
 add_library(obr_obj SHARED IMPORTED)
 set_target_properties(obr_obj PROPERTIES
-  IMPORTED_LOCATION         "${CMAKE_CURRENT_LIST_DIR}/lib/obr.so"
-  IMPORTED_LOCATION_DEBUG   "${CMAKE_CURRENT_LIST_DIR}/lib/obr.so"
-  IMPORTED_LOCATION_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/obr.so"
-  IMPORTED_LOCATION_RELWITHDEBINFO "${CMAKE_CURRENT_LIST_DIR}/lib/obr.so"
-  IMPORTED_SONAME "obr.so"
+  IMPORTED_LOCATION         "${CMAKE_CURRENT_LIST_DIR}/lib/libobr.a"
+  IMPORTED_LOCATION_DEBUG   "${CMAKE_CURRENT_LIST_DIR}/lib/libobr.a"
+  IMPORTED_LOCATION_RELEASE "${CMAKE_CURRENT_LIST_DIR}/lib/libobr.a"
+  IMPORTED_LOCATION_RELWITHDEBINFO "${CMAKE_CURRENT_LIST_DIR}/lib/libobr.a"
+  IMPORTED_SONAME "libobr.a"
   LINKER_LANGUAGE CXX)
 
 target_link_libraries(obr 
